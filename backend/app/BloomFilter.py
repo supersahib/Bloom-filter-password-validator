@@ -39,8 +39,6 @@ class BloomFilter:
     """
     if m = bit size, and n = expected items, we will need k hash functions (but we'll actually do something tricky because k hash functions is expensive)
     k = (m/n) * ln(2)
-    
-    source: https://en.wikipedia.org/wiki/Bloom_filter#Optimal_number_of_hash_functions
     """
     return (self.bit_size / math.log(2))
   
@@ -51,7 +49,6 @@ class BloomFilter:
     so instead of k hash functions, we'll use 2 base hashes to generate k positions
 
     following paper describes using 2 hash functions to simulate additional hash functions g(x) = h1(x) + i*h2(x)
-    https://www.eecs.harvard.edu/~michaelm/postscripts/rsa2008.pdf
     """
     # two independent hash vals
 
@@ -69,8 +66,6 @@ class BloomFilter:
     calculating and adding bits to Redis to persist
 
     SETBIT key offset value
-
-    https://redis.io/docs/latest/commands/setbit/
     """
     positions = self._get_bit_positions(password_hash)
 
