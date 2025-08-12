@@ -31,9 +31,6 @@ Hihg performance API for checking if passwords have been compromised in data bre
 ### Current Architecture
 <img src="./currentDiagram.png" alt="Architecture Diagram" width="50%">
 
-### Proposed Architecture (in progress)
-<img src="./proposedDiagram.png" alt="Architecture Diagram" width="50%">
-
 
 ### Current Features
 
@@ -67,3 +64,6 @@ GET /stats
     "memory_usage_mb": 1.72
   }
 ```
+
+### Proposed Architecture (in progress)
+<img src="./proposedDiagram.png" alt="Architecture Diagram" width="50%">
