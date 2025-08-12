@@ -9,11 +9,13 @@ Hihg performance API for checking if passwords have been compromised in data bre
 - **Privacy Focused**: Never stores actual passwords, only hashes
 - **Scalable**: Sharded Bloom filter design for distributed systems
 
-### Proposed Architecture
+### Current Architecture
+![Current Diagram](./currentDiagram.png)
+
+### Proposed Architecture (in progress)
 ![Architecture Diagram](./proposedDiagram.png)
 
-### Current Architecture
-![Current Diagram] (./currentDiagram.png)
+
 
 ### how it works
 
