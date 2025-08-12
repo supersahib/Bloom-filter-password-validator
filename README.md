@@ -10,13 +10,14 @@ Hihg performance API for checking if passwords have been compromised in data bre
 - **Scalable**: Sharded Bloom filter design for distributed systems
 
 ### Proposed Architecture
+![Architecture Diagram](./proposedDiagram.png)
 
-![Architecture Diagram](./diagram.png)
-
+### Current Architecture
+![Current Diagram] (./currentDiagram.png)
 
 ### how it works
 
-1. **Optimal size calculation** - uses math formulas to determine the ideal bit array size and # of hash functions, based on expected items and desired FP rate
+1. **Optimal size calculation** - uses math formulas to determine the ideal bit array size and # of hash functions, based on expected items & desired FP rate
 2. **Double hashing** - instead of k independent hash functions, use 2 base hashes to generate k positions
 	- We get hash count with following formula
 		- k = (m/n) * ln(2)
