@@ -6,16 +6,16 @@ from pydantic import BaseModel
 import hashlib
 
 # Connect to Redis
-redis_client = redis.Redis(
-    host='localhost',  
-    port=6379,
-    decode_responses=False
-)
+# redis_client = redis.Redis(
+#     host='localhost',  
+#     port=6379,
+#     decode_responses=False
+# )
 
 
 class BloomFilter:
 
-  def __init__(self, expected_items=1_000_000, fp_rate =0.001):
+  def __init__(self, redis_client, expected_items=1_000_000, fp_rate =0.001, ):
     """
     Calcaulte the optimal size & number of hash functions
     """
@@ -25,6 +25,7 @@ class BloomFilter:
     self.bit_size = self._calculate_bit_size()
     self.num_hashes = self._calculate_hash_count()
     self.redis_key = "bloom:passwords"
+    self.redis_client = redis_client
   
   def _calculate_bit_size(self):
     """
@@ -74,7 +75,7 @@ class BloomFilter:
     positions = self._get_bit_positions(password_hash)
 
     #set bits in redis using Redis pipeline
-    pipe = redis_client.pipeline()
+    pipe = self.redis_client.pipeline()
     for pos in positions:
       pipe.setbit(self.redis_key, pos, 1)
     pipe.execute()
@@ -87,12 +88,12 @@ class BloomFilter:
 
     positions = self._get_bit_positions(password_hash)
 
-    pipe = redis_client.pipeline()
+    pipe = self.redis_client.pipeline()
     for pos in positions:
       pipe.getbit(self.redis_key, pos)
       
-    redisBits = pipe.execute()
-    for bit in redisBits:
+    redis_bits = pipe.execute()
+    for bit in redis_bits:
       if bit == 0:
         return False
     return True
