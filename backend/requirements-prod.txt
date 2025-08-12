@@ -1,0 +1,4 @@
+# Production-specific dependencies
+gunicorn==21.2.0
+python-multipart==0.0.6
+pydantic[email]==2.11.7

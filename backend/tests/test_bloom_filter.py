@@ -1,6 +1,6 @@
 import pytest
 import math
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 from app.BloomFilter import BloomFilter
 
 class TestBloomFilter:
@@ -16,10 +16,23 @@ class TestBloomFilter:
         
         assert bf.expected_items == 1000
         assert bf.fp_rate == 0.01
-        assert bf.redis_key == "bloom:passwords"
+        assert bf.redis_key == "bloom:passwords"  # Default key
         assert bf.redis_client == mock_redis
         assert bf.bit_size > 0
         assert bf.num_hashes > 0
+    
+    def test_bloom_filter_with_custom_redis_key(self, mock_redis):
+        """Test BloomFilter with custom Redis key"""
+        bf = BloomFilter(
+            redis_client=mock_redis,
+            expected_items=1000,
+            fp_rate=0.01
+        )
+        
+        # Simulate setting custom key from settings
+        bf.redis_key = "bloom:passwords:test"
+        
+        assert bf.redis_key == "bloom:passwords:test"
     
     def test_calculate_bit_size(self, mock_redis):
         """Test bit size calculation formula"""
