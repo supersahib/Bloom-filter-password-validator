@@ -11,13 +11,20 @@ Hihg performance API for checking if passwords have been compromised in data bre
 
 ### Proposed Architecture
 
-![[Screenshot 2025-08-11 at 8.14.40 PM.png|600x600]]
+![[diagram.png|600x600]]
 
 
 ### how it works
 
 1. **Optimal size calculation** - uses math formulas to determine the ideal bit array size and # of hash functions, based on expected items and desired FP rate
+	- 
 2. **Double hashing** - instead of k independent hash functions, use 2 base hashes to generate k positions
+	- We get hash count with following formula
+		- k = (m/n) * ln(2)
+		- (https://en.wikipedia.org/wiki/Bloom_filter#Optimal_number_of_hash_functions)
+	- using k hash functions is expensive, so we use 2 base hashes to generate k positions
+		- g(x) = h1(x) + i * h2(x) 
+		- https://www.eecs.harvard.edu/~michaelm/postscripts/rsa2008.pdf
 3. **Redis persistence** - stores bit array in REdis using SETBIT & GETBIT operations for fast & persisten access
 
 ### What i've learned about Bloom filters
