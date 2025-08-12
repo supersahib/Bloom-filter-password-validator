@@ -10,11 +10,10 @@ Hihg performance API for checking if passwords have been compromised in data bre
 - **Scalable**: Sharded Bloom filter design for distributed systems
 
 ### Current Architecture
-![Current Diagram](./currentDiagram.png)
+<img src="./currentDiagram.png" alt="Architecture Diagram" width="50%">
 
 ### Proposed Architecture (in progress)
-![Architecture Diagram](./proposedDiagram.png)
-
+<img src="./proposedDiagram.png" alt="Architecture Diagram" width="50%">
 
 
 ### how it works
