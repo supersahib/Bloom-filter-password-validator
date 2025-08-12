@@ -1,0 +1,42 @@
+version: '3.8'
+services:
+  redis:
+    image: redis:7-alpine
+    # Alpine Linux variant - tiny (~30MB)
+    
+    ports:
+      - "6379:6379"
+    # Maps host:container ports
+    # Can access Redis from host for debugging
+    
+    volumes:
+      - redis_data:/data
+    # Named volume for data persistence
+    # Survives container restarts
+    
+    command: redis-server --appendonly yes
+    # Enables AOF persistence (writes every command to disk)
+    # More durable than default RDB snapshots
+  
+  api:
+    build: ./backend
+    # Builds from Dockerfile in backend/ directory
+    
+    ports:
+      - "8000:8000"
+    # Access API at http://localhost:8000
+    
+    depends_on:
+      - redis
+    # Ensures Redis starts first (but doesn't wait for "ready")
+    
+    environment:
+      - REDIS_HOST=redis
+      # "redis" resolves to Redis container IP
+      # Docker's internal DNS handles this
+      - REDIS_PORT=6379
+
+volumes:
+  redis_data:
+    # Named volume declaration
+    # Stored in /var/lib/docker/volumes/ on host
