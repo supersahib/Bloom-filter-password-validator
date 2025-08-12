@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  api:
+    build: 
+      context: ../backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=production
+      - DEBUG=false
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_SSL=${REDIS_SSL:-true}
+      - BLOOM_EXPECTED_ITEMS=${BLOOM_EXPECTED_ITEMS:-10000000}
+      - BLOOM_FALSE_POSITIVE_RATE=${BLOOM_FALSE_POSITIVE_RATE:-0.0001}
+      - BLOOM_REDIS_KEY=${BLOOM_REDIS_KEY:-bloom:passwords:prod}
+      - CORS_ORIGINS=${CORS_ORIGINS:-["https://yourdomain.com"]}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

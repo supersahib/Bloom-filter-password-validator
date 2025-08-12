@@ -2,7 +2,7 @@
 
 Hihg performance API for checking if passwords have been compromised in data breaches, using Redis-backed Bloom filters
 
-- **Space Efficient**: metrics to be added*
+- **Space Efficient**: Space Efficient: ~1.7MB for 1M passwords (aiming for ~1GB for 600M passwords)
 - **Fast Lookups**: metrics to be added*
 - **Low False Positive Rate**: Configurable accuracy (default 0.1% FP rate)
 - **Privacy Focused**: Never stores actual passwords, only hashes
@@ -35,4 +35,35 @@ Hihg performance API for checking if passwords have been compromised in data bre
 <img src="./proposedDiagram.png" alt="Architecture Diagram" width="50%">
 
 
+### Current Features
 
+ - Core Bloom filter implementation with optimal parameters
+ - FastAPI endpoints with JSON request/response models
+ - Docker containerization (Redis + API)
+ - Statistics endpoint for monitoring
+ - Automatic connection retry logic
+ - Test passwords loaded on startup
+
+
+### API Endpoints
+
+```
+POST /check
+
+  Body: {"password": "string"}
+  Response: {"compromised": boolean}
+```
+```
+POST /add  
+  Body: {"password": "string"}
+  Response: {"added": boolean}
+```
+```
+GET /stats
+  Response: {
+    "bit_size": 14377588,
+    "bits_set": 40,
+    "estimated_items": 4,
+    "memory_usage_mb": 1.72
+  }
+```

@@ -1,8 +1,18 @@
 # Virtual environment
 venv/
+.venv/
 
 # Python cache files
 __pycache__/
 *.pyc
 *.pyo
-.venv/
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Logs
+*.log
+logs/
