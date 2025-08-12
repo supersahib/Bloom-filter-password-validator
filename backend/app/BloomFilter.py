@@ -32,7 +32,7 @@ class BloomFilter:
     if n = expected items and p = false positive rate, we will need m bits
     m = -n * ln(p)  / (ln(2)^2)
     """
-    return -self.expected_items * math.log(self.fp_rate) / (math.log(2)**2)
+    return int(-self.expected_items * math.log(self.fp_rate) / (math.log(2)**2))
   
 
   def _calculate_hash_count(self):
@@ -40,7 +40,7 @@ class BloomFilter:
     if m = bit size, and n = expected items, we will need k hash functions (but we'll actually do something tricky because k hash functions is expensive)
     k = (m/n) * ln(2)
     """
-    return (self.bit_size / math.log(2))
+    return int((self.bit_size / self.expected_items) * math.log(2))
   
 
 
@@ -53,11 +53,11 @@ class BloomFilter:
     # two independent hash vals
 
     hash1 = mmh3.hash(item, seed=0)
-    hash2 = mmh3.hash(item, seed=hash1) # seed preventing correlation
+    hash2 = mmh3.hash(item, seed=1) # use different fixed seed
 
     positions = []
     for i in range(self.num_hashes):
-      position = (hash1 + i * hash2) % self.bit_size
+      position = int(abs(hash1 + i * hash2) % self.bit_size)
       positions.append(position)
     return positions
 

@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
 import redis
 from app.BloomFilter import BloomFilter
+import hashlib
 
 redis_client = None
 bloom_filter = None
