@@ -2,7 +2,7 @@
 venv/
 
 # Python cache files
-backend/app/__pycache__/
+__pycache__/
 *.pyc
 *.pyo
 .venv/
