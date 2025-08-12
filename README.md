@@ -1,69 +1,181 @@
-# Password Validator using Bloom Filter (and Redis)
+# Password Bloom Filter API
 
-Hihg performance API for checking if passwords have been compromised in data breaches, using Redis-backed Bloom filters
+High-performance API for checking if passwords have been compromised in data breaches, using Redis-backed Bloom filters.
 
-- **Space Efficient**: Space Efficient: ~1.7MB for 1M passwords (aiming for ~1GB for 600M passwords)
-- **Fast Lookups**: metrics to be added*
-- **Low False Positive Rate**: Configurable accuracy (default 0.1% FP rate)
-- **Privacy Focused**: Never stores actual passwords, only hashes
+## Features
 
-### how it works
+- **Space Efficient**: ~1.7MB for 1M passwords (scales to ~1GB for 600M passwords)
+- **Fast Lookups**: O(k) time complexity for lookups where k is the number of hash functions
+- **Low False Positive Rate**: Configurable accuracy (default 0.1% false positive rate)
+- **Privacy Focused**: Never stores actual passwords, only cryptographic hashes
 
-1. **Optimal size calculation** - uses math formulas to determine the ideal bit array size and # of hash functions, based on expected items & desired FP rate
-2. **Double hashing** - instead of k independent hash functions, use 2 base hashes to generate k positions
-	- We get hash count with following formula
-		- k = (m/n) * ln(2)
-		- (https://en.wikipedia.org/wiki/Bloom_filter#Optimal_number_of_hash_functions)
-	- using k hash functions is expensive, so we use 2 base hashes to generate k positions
-		- g(x) = h1(x) + i * h2(x) 
-		- https://www.eecs.harvard.edu/~michaelm/postscripts/rsa2008.pdf
-3. **Redis persistence** - stores bit array in REdis using SETBIT & GETBIT operations for fast & persisten access
+## How It Works
 
-### What i've learned about Bloom filters
-- Bloom filter is a probablistic data structure that tells you one of 2 things:
-	1) data is DEFINITELY not in set --> if any bit is 0, item was never added
-	2) data is POSSIBLY in set --> if all bits are 1, item might have been added
+1. **Optimal Size Calculation**: Uses mathematical formulas to determine the ideal bit array size and number of hash functions based on expected items and desired false positive rate.
 
-- for password checking this is okay because:
-	- false positives are acceptable  (we're better safe than sorry here)
-	- false negatives never occur (will never miss a breached password)
+2. **Double Hashing**: Instead of k independent hash functions, uses 2 base hashes to generate k positions:
+   - Hash count formula: `k = (m/n) * ln(2)`
+   - Reference: [Wikipedia - Bloom Filter](https://en.wikipedia.org/wiki/Bloom_filter#Optimal_number_of_hash_functions)
+   - Position generation: `g(x) = h1(x) + i * h2(x)`
+   - Reference: [Less Hashing, Same Performance](https://www.eecs.harvard.edu/~michaelm/postscripts/rsa2008.pdf)
 
-### Current Architecture
-<img src="./currentDiagram.png" alt="Architecture Diagram" width="50%">
+3. **Redis Persistence**: Stores bit array in Redis using SETBIT and GETBIT operations for fast and persistent access.
 
+## Bloom Filter Properties
 
-### Current Features
+A Bloom filter is a probabilistic data structure that provides two possible outcomes:
 
- - Core Bloom filter implementation with optimal parameters
- - FastAPI endpoints with JSON request/response models
- - Docker containerization (Redis + API)
- - Statistics endpoint for monitoring
- - Automatic connection retry logic
- - Test passwords loaded on startup
+1. **Definitely not in set**: If any bit is 0, the item was never added
+2. **Possibly in set**: If all bits are 1, the item might have been added
 
+For password checking, this behavior is acceptable because:
+- False positives are tolerable (better safe than sorry)
+- False negatives never occur (will never miss a breached password)
 
-### API Endpoints
+## Architecture
 
-```
+![Current Architecture](./currentDiagram.png)
+
+## Features
+
+- Core Bloom filter implementation with optimal parameters
+- FastAPI endpoints with JSON request/response models
+- Docker containerization (Redis + API)
+- Statistics endpoint for monitoring
+- Automatic connection retry logic
+- Environment-based configuration (development/production)
+- Comprehensive test suite
+- Production deployment configurations
+
+## API Endpoints
+
+### Check Password
+
+```http
 POST /check
+Content-Type: application/json
 
-  Body: {"password": "string"}
-  Response: {"compromised": boolean}
+{
+  "password": "string"
+}
 ```
+
+**Response:**
+```json
+{
+  "compromised": boolean,
+  "message": "string"
+}
 ```
-POST /add  
-  Body: {"password": "string"}
-  Response: {"added": boolean}
+
+### Add Password
+
+```http
+POST /add
+Content-Type: application/json
+
+{
+  "password": "string"
+}
 ```
+
+**Response:**
+```json
+{
+  "added": boolean,
+  "message": "string"
+}
 ```
+
+### Get Statistics
+
+```http
 GET /stats
-  Response: {
-    "bit_size": 14377588,
-    "bits_set": 40,
-    "estimated_items": 4,
-    "memory_usage_mb": 1.72
-  }
 ```
 
-### Proposed Architecture (in progress)
-<img src="./proposedDiagram.png" alt="Architecture Diagram" width="50%">
+**Response:**
+```json
+{
+  "bit_size": 14377588,
+  "bits_set": 40,
+  "num_hashes": 7,
+  "expected_items": 1000000,
+  "false_positive_rate": 0.001,
+  "memory_usage_mb": 1.72
+}
+```
+
+### Health Check
+
+```http
+GET /health
+```
+
+**Response:**
+```json
+{
+  "status": "healthy",
+  "message": "string"
+}
+```
+
+## Installation and Usage
+
+### Prerequisites
+
+- Python 3.8+
+- Redis server
+- Docker (optional)
+
+### Local Development
+
+1. Clone the repository
+2. Create a virtual environment:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+3. Install dependencies:
+   ```bash
+   cd backend
+   pip install -r requirements.txt
+   ```
+4. Start Redis server
+5. Run the application:
+   ```bash
+   uvicorn app.main:app --reload
+   ```
+
+### Docker Development
+
+```bash
+docker-compose up --build
+```
+
+### Production Deployment
+
+```bash
+docker-compose -f deployment/docker-compose.prod.yml up -d
+```
+
+## Configuration
+
+The application uses environment variables for configuration:
+
+- `ENVIRONMENT`: Set to "production" for production deployment
+- `REDIS_HOST`: Redis server hostname
+- `REDIS_PORT`: Redis server port
+- `REDIS_PASSWORD`: Redis authentication password
+- `BLOOM_EXPECTED_ITEMS`: Expected number of items in the filter
+- `BLOOM_FALSE_POSITIVE_RATE`: Desired false positive rate
+
+See `backend/env.example` for a complete list of configuration options.
+
+## Testing
+
+Run the test suite:
+
+```bash
+cd backend
+pytest tests/ -v
+```
