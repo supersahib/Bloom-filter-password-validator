@@ -5,16 +5,7 @@ Hihg performance API for checking if passwords have been compromised in data bre
 - **Space Efficient**: metrics to be added*
 - **Fast Lookups**: metrics to be added*
 - **Low False Positive Rate**: Configurable accuracy (default 0.1% FP rate)
-- **REST API**: FastAPI backend with automatic documentation
 - **Privacy Focused**: Never stores actual passwords, only hashes
-- **Scalable**: Sharded Bloom filter design for distributed systems
-
-### Current Architecture
-<img src="./currentDiagram.png" alt="Architecture Diagram" width="50%">
-
-### Proposed Architecture (in progress)
-<img src="./proposedDiagram.png" alt="Architecture Diagram" width="50%">
-
 
 ### how it works
 
@@ -36,3 +27,12 @@ Hihg performance API for checking if passwords have been compromised in data bre
 - for password checking this is okay because:
 	- false positives are acceptable  (we're better safe than sorry here)
 	- false negatives never occur (will never miss a breached password)
+
+### Current Architecture
+<img src="./currentDiagram.png" alt="Architecture Diagram" width="50%">
+
+### Proposed Architecture (in progress)
+<img src="./proposedDiagram.png" alt="Architecture Diagram" width="50%">
+
+
+
